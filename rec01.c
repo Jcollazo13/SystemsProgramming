@@ -1,5 +1,7 @@
 // Jonathan Collazo || EUID: 11535014 || CSCE 3600 Systems Programming
 
+// Program reads in ASCII char from user & prints decimal, hexadecimal, & binary values for char 
+
 #include <stdio.h>
 
 
