@@ -1,10 +1,12 @@
 #!/bin/bash
+#Jonathan Collazo || CSCE 3600 || EUID: 11535014 
+#This script monitors users logging in and out of the UNT CSCE machines in 5 second intervals.
 
 printDateTime () {
     echo "Current date and time: $(date '+%a %b %d %H:%M:%S %Z %Y')"
 }
 
-# Define function to print number of logged in users
+#Prints number of users logged in at timed called 
 printNumUsers(){
     numUsers=$(who | wc -l)
     echo "$(date '+%a %b %d %H:%M:%S %Z %Y') # of users: $numUsers"
@@ -16,6 +18,7 @@ printHeader(){
     echo "============================================ "
 }
 
+#Confirms user wants to exit script when sigint is received 
 confirmExit(){
     read -p " Are you sure you want to exit(y/n)?" -n 1 -r
     echo
@@ -28,10 +31,10 @@ confirmExit(){
     fi
 }
 
-# Traps
+# Traps sigint
 trap confirmExit SIGINT
 
-# Print current date and time and number of logged in users
+# Prints headers 
 printDateTime
 printHeader
 printNumUsers
