@@ -1,7 +1,7 @@
 #!/bin/bash
 
 printDateTime () {
-    echo "Current date and time: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Current date and time: $(date '+%m-%d-%Y %H:%M')"
 }
 
 # Define function to print number of logged in users
@@ -10,11 +10,18 @@ printNumUsers(){
     echo "Number of logged in users: $numUsers"
 }
 
-# Function to handle INT signal
-trap 'echo "Signal trapped. Press ^C one more time to terminate the script."' INT
+printHeader(){
+    
+    echo "User ID  ||  Date/Time   ||    Process Count "
+    echo "============================================ "
+}
+
+# Function to confirm exit command
+trap 'read -p " Are you sure you want to exit(y/n)?" -n 1 -r; echo; if [[ $REPLY =~ ^[Yy]$ ]]; then exit 1; fi' INT
 
 # Print current date and time and number of logged in users
 printDateTime
+printHeader
 printNumUsers
 
 # Initialize array of current logged in users
@@ -31,6 +38,12 @@ do
 
     # Get list of currently logged in users
     newUsers=($(who | awk '{print $1 "@" $NF}'))
+
+    #print current users logged in 
+    for user in "${currentUsers[@]}"
+    do
+        echo "${user%*@} || $(date '+%m-%d-%Y %H:%M') || $(ps -u ${user%*@} | wc -l)"
+    done
 
     # Compare current and new user arrays to detect changes
     for user in "${newUsers[@]}"
