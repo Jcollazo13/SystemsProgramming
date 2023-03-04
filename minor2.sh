@@ -27,6 +27,12 @@ printNumUsers
 # Initialize array of current logged in users
 currentUsers=($(who | awk '{print $1 "@" $NF}'))
 
+#print current users logged in 
+for user in "${currentUsers[@]}"
+do
+    echo "${user%*@} || $(date '+%m-%d-%Y %H:%M') || $(ps -u ${user%*@} | wc -l)"
+done
+
 # Loop indefinitely to monitor users
 while true
 do
@@ -38,12 +44,6 @@ do
 
     # Get list of currently logged in users
     newUsers=($(who | awk '{print $1 "@" $NF}'))
-
-    #print current users logged in 
-    for user in "${currentUsers[@]}"
-    do
-        echo "${user%*@} || $(date '+%m-%d-%Y %H:%M') || $(ps -u ${user%*@} | wc -l)"
-    done
 
     # Compare current and new user arrays to detect changes
     for user in "${newUsers[@]}"
