@@ -1,71 +1,81 @@
 #!/bin/bash
 
 printDateTime () {
-    echo "Current date and time: $(date '+%m-%d-%Y %H:%M')"
+    echo "Current date and time: $(date '+%a %b %d %H:%M:%S %Z %Y')"
 }
 
 # Define function to print number of logged in users
 printNumUsers(){
     numUsers=$(who | wc -l)
-    echo "Number of logged in users: $numUsers"
+    echo "$(date '+%a %b %d %H:%M:%S %Z %Y') # of users: $numUsers"
 }
 
 printHeader(){
     
-    echo "User ID  ||  Date/Time   ||    Process Count "
+    echo "            User Monitor "
     echo "============================================ "
 }
 
-# Function to confirm exit command
-trap 'read -p " Are you sure you want to exit(y/n)?" -n 1 -r; echo; if [[ $REPLY =~ ^[Yy]$ ]]; then exit 1; fi' INT
+confirmExit(){
+    read -p " Are you sure you want to exit(y/n)?" -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo "Exiting ......."
+        exit 1
+    else 
+        echo "Continuing ......."
+    fi
+}
+
+# Traps
+trap confirmExit SIGINT
 
 # Print current date and time and number of logged in users
 printDateTime
 printHeader
 printNumUsers
 
-# Initialize array of current logged in users
-currentUsers=($(who | awk '{print $1 "@" $NF}'))
+# create array of currently logged in users
+currentUsers=($(users))
 
-#print current users logged in 
+#print current users logged in
+echo "Current users logged in: "
 for user in "${currentUsers[@]}"
 do
-    echo "${user%*@} || $(date '+%m-%d-%Y %H:%M') || $(ps -u ${user%*@} | wc -l)"
+    echo "${user} is logged in to $HOSTNAME"
 done
 
-# Loop indefinitely to monitor users
+# Loop to monitor users logging in and out
 while true
 do
     # Wait for 5 seconds
     sleep 5
 
-    # Print current date and time
-    printDateTime
-
-    # Get list of currently logged in users
-    newUsers=($(who | awk '{print $1 "@" $NF}'))
+    # Create new array of currently logged in users 
+    newUsers=($(users))
 
     # Compare current and new user arrays to detect changes
     for user in "${newUsers[@]}"
     do
+        # Looking for new users that are not in currentUsers array, if found, means that user logged in 
         if [[ ! " ${currentUsers[@]} " =~ " ${user} " ]]
         then
-            # User logged in
-            echo "User ${user%*@} logged in from ${user#*@}"
+            echo "${user} logged in to $HOSTNAME"
         fi
     done
 
+    #Looking for users that are not in newUsers array, if found, means that user logged out
     for user in "${currentUsers[@]}"
     do
         if [[ ! " ${newUsers[@]} " =~ " ${user} " ]]
         then
-            # User logged out
-            echo "User ${user%*@} logged out from ${user#*@}"
+            echo "${user} logged out of $HOSTNAME"
         fi
     done
 
-    # Update current user array
-    current_users=("${newUsers[@]}")
+    # Update current user array before next loop
+    currentUsers=("${newUsers[@]}")
 
     # Print number of logged in users
     printNumUsers
