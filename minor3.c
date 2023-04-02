@@ -131,9 +131,72 @@ char *builtin_str[] = {
     "exit"
 };
 
+
 int (*builtin_func[]) (char **) = {
     &shell_cd,
     &shell_help,
     &shell_exit
 };
 
+// gets the number of built in commands 
+int shell_num_builtins()
+{
+  return sizeof(builtin_str) / sizeof(char *); 
+}
+
+// Builtin command implementations
+
+int shell_cd(char **args)
+{
+    if(args[1] == NULL) // Check if argument is valid
+    {
+        fprintf(stderr, "shell: expected argument to \"cd\"\n");
+    }
+    else
+    {
+        if(chdir(args[1]) != 0) // Change directory
+        {
+            perror("shell"); // Error message
+        }
+    }
+    return 1;
+}
+
+int shell_help(char **args)
+{
+    printf("Jonathan Collazo's Shell\n");
+    printf("Type program names and arguments, and hit enter.\n");
+    printf("The following are built in:\n");
+
+    // pring built in commands 
+    for(int i = 0; i < shell_num_builtins(); i++)
+    {
+        printf(" %s\n", builtin_str[i]);
+    }
+
+    return 1; 
+}
+
+int shell_exit(char **args)
+{
+    return 0; // Exit shell
+}
+
+int shell_execute(char **args)
+{
+    if(args[0] == NULL) // Check if command was entered
+    {
+        printf("No command entered\n"); 
+        return 1;
+    }
+
+    for(int i = 0; i < shell_num_builtins(); i++) // Check if command is built in
+    {
+        if(strcmp(args[0], builtin_str[i]) == 0)
+        {
+            return (*builtin_str[i])(args);
+        }
+    }
+
+    return shell_launch(args); // Launch command
+}
