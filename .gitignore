@@ -1,2 +1,4 @@
-rec01.exe
-rec02.exe
+*.exe
+*.out
+*.txt
+*.cmake
