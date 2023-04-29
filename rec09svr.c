@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   portno = atoi(argv[1]);
   serv_addr.sin_port = htons(portno);
 
-  if (bind(listenfd, (struct sockaddr *)&cli_addr, sizeof(cli_addr)) == -1) {
+  if (bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
     printf("bind error\n");
     exit(EXIT_FAILURE);
   }
